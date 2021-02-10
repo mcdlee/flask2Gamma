@@ -1,0 +1,98 @@
+# GEOMETRY
+####
+
+# Scanner Head
+
+## 位置可從 dicom 寫入
+# Create a new box representing the main head-volume
+# SPECThead is the name of the predefined SPECT system
+# Create the SPECT system, which will yield an Interfile output of projection data
+/gate/world/daughters/name SPECThead
+/gate/world/daughters/insert box
+/gate/SPECThead/geometry/setXLength {{result.DetectorLength}} mm
+/gate/SPECThead/geometry/setYLength {{result.DetectorDepth}} mm
+/gate/SPECThead/geometry/setZLength {{result.DetectorWidth}} mm
+/gate/SPECThead/placement/setTranslation  0. {{result.DetecotrShift}} 0. mm
+/gate/SPECThead/setMaterial Air
+/gate/SPECThead/vis/forceWireframe
+
+# Shielding
+# Create the shielding volume
+/gate/SPECThead/daughters/name shielding
+/gate/SPECThead/daughters/insert box
+/gate/shielding/geometry/setXLength {{result.DetectorLength}} mm
+/gate/shielding/geometry/setYLength {{result.DetectorDepth}} mm
+/gate/shielding/geometry/setZLength {{result.DetectorWidth}} mm
+/gate/shielding/placement/setTranslation  0. 0. 0. mm
+/gate/shielding/setMaterial Lead
+/gate/shielding/vis/setColor red
+/gate/shielding/vis/forceWireframe
+
+# Siemens Symbia T ME collimator
+
+/gate/SPECThead/daughters/name collimator
+/gate/SPECThead/daughters/insert box 
+/gate/collimator/geometry/setXLength {{result.CryLeng}} mm
+/gate/collimator/geometry/setYLength {{result.CryWid}} mm
+/gate/collimator/geometry/setZLength {{result.CollDep}} mm
+/gate/collimator/placement/setRotationAxis 1 0 0
+/gate/collimator/placement/setRotationAngle 90 deg
+/gate/collimator/placement/setTranslation 0 {{result.CollimatorShift}} 0 mm
+/gate/collimator/setMaterial Lead
+/gate/collimator/vis/setColor blue 
+/gate/collimator/vis/forceWireframe 
+
+## hole of collimator
+/gate/collimator/daughters/name hole 
+/gate/collimator/daughters/insert hexagone 
+/gate/hole/geometry/setRadius {{result.HoleR}} mm
+/gate/hole/geometry/setHeight {{result.CollDep}} mm #thickness
+/gate/hole/placement/setTranslation 0 0 0 mm 
+/gate/hole/placement/setRotationAxis 0 0 1
+/gate/hole/placement/setRotationAngle 30 deg
+/gate/hole/setMaterial Air
+/gate/hole/vis/setColor blue 
+/gate/hole/vis/forceWireframe
+
+### Repeat of holes
+/gate/hole/repeaters/insert cubicArray
+/gate/hole/cubicArray/setRepeatNumberX {{result.XRepeat}}
+/gate/hole/cubicArray/setRepeatNumberY {{result.YRepeat}}
+/gate/hole/cubicArray/setRepeatNumberZ 1
+/gate/hole/cubicArray/setRepeatVector {{result.Xgap}} {{result.Ygap}} 0 mm
+/gate/hole/repeaters/insert linear
+/gate/hole/linear/setRepeatNumber 2
+/gate/hole/linear/setRepeatVector {{result.Xgaphalf}} {{result.Ygaphalf}} 0 mm
+
+## CRYSTAL
+/gate/SPECThead/daughters/name crystal
+/gate/SPECThead/daughters/insert box 
+/gate/crystal/geometry/setXLength {{result.CryLeng}} mm
+/gate/crystal/geometry/setYLength {{result.CryDep}} mm
+/gate/crystal/geometry/setZLength {{result.CryWid}} mm
+/gate/crystal/placement/setTranslation 0 {{result.CrystalShift}} 0 mm
+/gate/crystal/setMaterial NaI
+/gate/crystal/vis/setColor yellow
+
+/gate/geometry/rebuild
+
+## Back-compartment
+# Create the back-compartment volume
+/gate/SPECThead/daughters/name compartment
+/gate/SPECThead/daughters/insert box
+/gate/compartment/geometry/setXLength {{result.CryLeng}} mm
+/gate/compartment/geometry/setYLength {{result.PMTDep}} mm
+/gate/compartment/geometry/setZLength {{result.CryWid}} mm
+/gate/compartment/placement/setTranslation   0. {{result.PMTShift}} 0  mm
+/gate/compartment/setMaterial Glass
+/gate/compartment/vis/setColor grey
+
+/gate/geometry/rebuild
+
+### Attach
+/gate/shielding/attachPhantomSD
+/gate/collimator/attachPhantomSD
+/gate/systems/SPECThead/crystal/attach crystal
+/gate/crystal/attachCrystalSD
+/gate/compartment/attachPhantomSD
+/gate/systems/SPECThead/describe #new
