@@ -29,8 +29,8 @@ def submit():
 	result['Ygaphalf'] = result['Ygap']/2
 
 	
-	result['XRepeat'] = float(input['CryLeng'])//result['Xgap']
-	result['YRepeat'] = float(input['CryWid'])//result['Ygap']
+	result['XRepeat'] = "%d" % (float(input['CryLeng'])//result['Xgap'])
+	result['YRepeat'] = "%d" % (float(input['CryWid'])//result['Ygap'])
 	return render_template('output.txt', result=result)
 
 if __name__ == '__main__':
