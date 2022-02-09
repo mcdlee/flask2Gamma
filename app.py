@@ -12,15 +12,15 @@ def submit():
 	input = request.form
 	
 	result = {**input}
-	
+
 	result['DetectorWidth'] = float(input['ShSide'])*2 + float(input['CryWid'])
-	result['DetectorDepth'] = float(input['ShBack']) + float(input['CollDep']) + float(input['CryDep']) + float(input['PMTDep'])
+	result['DetectorDepth'] = round(float(input['ShBack']) + float(input['CollDep']) + float(input['CryDep']) + float(input['PMTDep']), 3)
 	result['DetectorLength'] = float(input['ShSide'])*2 + float(input['CryLeng'])
-	result['DetecotrShift'] = result['DetectorDepth']/2 + float(input['Dist'])
+	result['DetectorShift'] = round(result['DetectorDepth']/2 + float(input['Dist']),4)
 	
-	result['CollimatorShift'] = -result['DetectorDepth']/2 + float(input['CollDep'])/2	
-	result['CrystalShift'] = -result['DetectorDepth']/2 + float(input['CollDep']) + float(input['CryDep'])/2
-	result['PMTShift'] = result['DetectorDepth']/2 - float(input['ShBack']) - float(input['PMTDep'])/2
+	result['CollimatorShift'] = round(-result['DetectorDepth']/2 + float(input['CollDep'])/2, 4)
+	result['CrystalShift'] = round(-result['DetectorDepth']/2 + float(input['CollDep']) + float(input['CryDep'])/2, 4)
+	result['PMTShift'] = round(result['DetectorDepth']/2 - float(input['ShBack']) - float(input['PMTDep'])/2, 4)
 	
 	result['Xgap'] = float(input['HoleR'])*2 + float(input['Septa'])
 	result['Ygap'] = result['Xgap'] * 1.732050807568877
